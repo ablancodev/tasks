@@ -1,0 +1,9 @@
+.producto-row {
+	margin: 10px 0px;
+}
+.imagen-producto-container {
+	min-height: 300px;
+}
+.modal {
+	top: 150px;
+}
