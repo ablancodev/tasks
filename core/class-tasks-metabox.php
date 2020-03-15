@@ -7,7 +7,53 @@ class Tasks_Metabox {
     public static function init() {
         add_action( 'add_meta_boxes', array( __CLASS__, 'add_metabox'  )        );
         add_action( 'save_post',      array( __CLASS__, 'save_metabox' ), 10, 2 );
+        
+        // Tax
+        add_action( 'state_add_form_fields', array( __CLASS__, 'state_add_form_fields' ), 10, 2 );
+        add_action( 'state_edit_form_fields', array( __CLASS__, 'state_edit_form_fields' ), 10, 2 );
+        add_action( 'edited_state', array( __CLASS__, 'save_state' ), 10, 2 );
+        add_action( 'create_state', array( __CLASS__, 'save_state' ), 10, 2 );
     }
+    
+    public static function save_state( $term_id ) {
+        if ( isset( $_POST['term_meta'] ) ) {
+            
+            $t_id = $term_id;
+            $term_meta = get_option( "taxonomy_$t_id" );
+            $cat_keys = array_keys( $_POST['term_meta'] );
+            foreach ( $cat_keys as $key ) {
+                if ( isset ( $_POST['term_meta'][$key] ) ) {
+                    $term_meta[$key] = $_POST['term_meta'][$key];
+                }
+            }
+            // Save the option array.
+            update_option( "taxonomy_$t_id", $term_meta );
+        }
+        
+    } 
+    
+    public static function state_add_form_fields() {
+        ?>
+		<div class="form-field">
+			<label for="term_meta[class_term_meta]"><?php _e( 'Color', 'tasks' ); ?></label>
+			<input type="text" name="term_meta[color]" id="term_meta[color]" value="">
+		</div>
+	<?php
+	}
+    
+	public static function state_edit_form_fields( $term ) {
+	    
+	    $t_id = $term->term_id;
+	    $term_meta = get_option( "taxonomy_$t_id" );
+	    ?>
+		<tr class="form-field">
+		<th scope="row" valign="top"><label for="term_meta[color]"><?php _e( 'Color', 'tasks' ); ?></label></th>
+			<td>
+				<input type="text" name="term_meta[color]" id="term_meta[color]" value="<?php echo esc_attr( $term_meta['color'] ) ? esc_attr( $term_meta['color'] ) : ''; ?>">
+			</td>
+		</tr>
+	<?php
+	}
     
     /**
      * Adds the meta box.
@@ -17,7 +63,7 @@ class Tasks_Metabox {
             'my-meta-box',
             __( 'Información', TASKS_PLUGIN_DOMAIN ),
             array( __CLASS__, 'render_metabox' ),
-            'producto',
+            'task',
             'side',
             'default'
             );

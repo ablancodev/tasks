@@ -128,6 +128,9 @@ class Tasks_Plugin {
 						type="text" name="tasks_settings_name"
 						value="<?php echo get_option( "tasks_settings_name" ); ?>" />
 				</p>
+				<p>
+				<input type="text" value="" data-default-color="#444" class="color-field"></input>
+				</p>
 				<?php
 				wp_nonce_field ( 'tasks_settings', 'tasks_settings' )?>
 					<input type="submit"

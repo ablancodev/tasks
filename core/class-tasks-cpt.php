@@ -91,7 +91,7 @@ class Tasks_CPT {
 	        'choose_from_most_used' => __( 'Choose from the most used projects' ),
 	        'menu_name' => __( 'Projects' ),
 	    );
-	    register_taxonomy( 'projects', 'task', array(
+	    register_taxonomy( 'project', 'task', array(
 	        'hierarchical' => false,
 	        'labels' => $labels,
 	        'show_ui' => true,

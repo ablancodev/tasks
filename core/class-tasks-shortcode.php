@@ -16,16 +16,36 @@ class Tasks_Shortcode {
                     <tr>
                     <th scope="col">#</th>
                     <th scope="col">Asignada a</th>
+                    <th scope="col">Proyecto</th>
                     <th scope="col">Título</th>
                     <th scope="col">Estado</th>
                     </tr>
                 </thead>
                 <tbody>';
-            foreach ( $tasks as $key => $task ) {
+            foreach ( $tasks as $task ) {
+                $state = get_the_terms( $task, 'state' );
+                if ( $state ) {
+                    $state = $state[0]->term_id;
+                } else {
+                    $state = 0;
+                }
+                $project = get_the_terms( $task, 'project' );
+                if ( $project ) {
+                    $project_name = $project[0]->name;
+                } else {
+                    $project_name = '--';
+                }
+                $back_color = '';
+                $term_meta = get_option( 'taxonomy_' . $state );
+                if ( $term_meta ) {
+                    $back_color = 'background-color:' . $term_meta['color'] . ';';
+                }
+                
                 $output .= '
-                <tr>
+                <tr style="' . $back_color .'">
                   <th scope="row">#' . $task->ID . '</th>
                   <td>' . 'Autor' . '</td>
+                  <td>' . $project_name . '</td>
                   <td><a href="' . get_the_permalink( $task->ID ) . '">' . get_the_title( $task->ID ) . '</a></td>
                   <td>' . strip_tags( get_the_term_list( $task->ID, 'state' ) ) . '</td>
                 </tr>
