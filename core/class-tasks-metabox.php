@@ -56,12 +56,12 @@ class Tasks_Metabox {
 	}
     
     /**
-     * Adds the meta box.
+     * Adds the metaboxes to 'tasks'
      */
     public static function add_metabox() {
         add_meta_box(
             'my-meta-box',
-            __( 'Información', TASKS_PLUGIN_DOMAIN ),
+            __( 'User', TASKS_PLUGIN_DOMAIN ),
             array( __CLASS__, 'render_metabox' ),
             'task',
             'side',
@@ -76,10 +76,30 @@ class Tasks_Metabox {
     public static function render_metabox( $post ) {
         // Add nonce for security and authentication.
         wp_nonce_field( 'custom_nonce_action', 'custom_nonce' );
-        $outline = '<label for="title_field" style="width:150px; display:inline-block;">'. esc_html__('Precio', TASKS_PLUGIN_DOMAIN) .'</label>';
-        $title_field = get_post_meta( $post->ID, 'precio', true );
-        $outline .= '<input type="text" name="precio" id="title_field" class="title_field" value="'. esc_attr($title_field) .'" />';
-        echo $outline;
+        ?>
+        <label for="title_field" style="width:150px; display:inline-block;"><?php echo esc_html__('User', TASKS_PLUGIN_DOMAIN);?></label>
+		<select id="user" name="user" class="title_field">
+  		<?php 
+  		$post_user_id = get_post_meta( $post->ID, 'user', true );
+  		$users = get_users();
+  		foreach ( $users as $user ) {
+  		    $user_info = get_userdata( $user->ID );
+  		    $selected = '';
+  		    if ( $post_user_id == $user->ID ) {
+  		        $selected = 'selected="selected"';    
+  		    }
+  		?>
+  			<option value="<?php echo $user_info->ID;?>" <?php echo $selected;?> ><?php echo esc_html( $user_info->display_name );?></option>
+  		<?php 
+  		}
+  		?>
+  		</select>       
+        
+        <?php
+        //$outline = '<label for="title_field" style="width:150px; display:inline-block;">'. esc_html__('User', TASKS_PLUGIN_DOMAIN) .'</label>';
+        //$title_field = get_post_meta( $post->ID, 'precio', true );
+        //$outline .= '<input type="text" name="precio" id="title_field" class="title_field" value="'. esc_attr($title_field) .'" />';
+        //echo $outline;
     }
     
     /**
@@ -119,8 +139,8 @@ class Tasks_Metabox {
             return;
         }
         */
-        $precio   = isset( $_POST['precio'] ) ? sanitize_text_field( $_POST['precio'] ) : '';
-        update_post_meta( $post_id, 'precio', $precio );
+        $user_id   = isset( $_POST['user'] ) ? sanitize_text_field( $_POST['user'] ) : '';
+        update_post_meta( $post_id, 'user', $user_id );
     }
 }
 

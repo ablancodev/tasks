@@ -82,10 +82,15 @@ class Tasks_Plugin {
 
 
 	public static function wp_enqueue_scripts($page) {
-	// css
-		wp_register_style ( 'tasks-style', TASKS_PLUGIN_URL . '/css/tasks-style.css', array (), '1.0.0' );
-		wp_enqueue_style ( 'tasks-style' );
-
+	    // js
+	    // Our javascript
+	    wp_register_script ( 'task-scripts', TASKS_PLUGIN_URL . '/js/tasks.js', array ( 'jquery' ), microtime(true), true );
+	    wp_enqueue_script ( 'task-scripts' );
+	    
+	    // css
+	    wp_register_style ( 'tasks-style', TASKS_PLUGIN_URL . '/css/tasks-style.css', array (), '1.0.0' );
+	    wp_enqueue_style ( 'tasks-style' );
+	    
 
 	}
 

@@ -10,6 +10,7 @@ class Tasks_Shortcode {
         if ( $tasks ) {
             $output .= '<div class="container">';
             $output .= '<div class="row task-row">';
+            $output .= '<input type="text" id="taskSearchInput" placeholder="' . __( 'Search', 'tasks' ) . '"/>';
             $output .= '
             <table class="table">
                 <thead class="thead-dark">
@@ -21,7 +22,7 @@ class Tasks_Shortcode {
                     <th scope="col">Estado</th>
                     </tr>
                 </thead>
-                <tbody>';
+                <tbody id="tasksTable">';
             foreach ( $tasks as $task ) {
                 $state = get_the_terms( $task, 'state' );
                 if ( $state ) {
@@ -41,10 +42,11 @@ class Tasks_Shortcode {
                     $back_color = 'background-color:' . $term_meta['color'] . ';';
                 }
                 
+                $post_user_id = get_post_meta( $task->ID, 'user', true );
                 $output .= '
                 <tr style="' . $back_color .'">
                   <th scope="row">#' . $task->ID . '</th>
-                  <td>' . 'Autor' . '</td>
+                  <td>' . get_avatar( $post_user_id ) . '</td>
                   <td>' . $project_name . '</td>
                   <td><a href="' . get_the_permalink( $task->ID ) . '">' . get_the_title( $task->ID ) . '</a></td>
                   <td>' . strip_tags( get_the_term_list( $task->ID, 'state' ) ) . '</td>
