@@ -5,8 +5,53 @@ class Tasks_Shortcode {
     }
 
     public static function tasks_list() {
+        global $post;
+        
         $output = '';
-        $tasks = get_posts( array( 'post_type' => 'task', 'numberposts' => -1 ) );
+        
+        $user_id = get_current_user_id();
+        if ( current_user_can( 'manage_options' ) ) { // admin
+            $tasks = get_posts( array( 'post_type' => 'task', 'numberposts' => -1 ) );
+        } else { // only his tasks
+            // get his projects
+            $args = array(
+                'hide_empty' => false, // also retrieve terms which are not used yet
+                'meta_query' => array(
+                    array(
+                        'key'       => 'user',
+                        'value'     => $user_id
+                    )
+                ),
+                'taxonomy'  => 'project',
+            );
+            $projects = get_terms( $args );
+            $projects_id = array();
+            if ( $projects ) {
+                foreach ( $projects as $project ) {
+                    $projects_id[] = $project->term_id;
+                }
+            }
+            // get tasks in these projects
+            $tasks_query = new WP_Query( array(
+                'post_type' => 'task',
+                'tax_query' => array(
+                    array(
+                        'taxonomy' => 'project',
+                        'field' => 'term_id',
+                        'terms' => $projects_id,
+                        'operator' => 'IN'
+                    )
+                )
+            ) );
+            $temp_post = $post;
+            $tasks = array();
+            while( $tasks_query->have_posts() ) {
+                $tasks_query->the_post();
+                $tasks[] = $post;
+            }
+            $post = $temp_post;
+        }
+        
         if ( $tasks ) {
             $output .= '<div class="container">';
             $output .= '<div class="row task-row">';
@@ -52,32 +97,7 @@ class Tasks_Shortcode {
                   <td>' . strip_tags( get_the_term_list( $task->ID, 'state' ) ) . '</td>
                 </tr>
                 ';
-                
-                /*
-                $output .= '<div class="col-sm-12">';
-                $output .= '<div class="">';
-                $output .= '<a href="#task_modal_' . $key . '" data-toggle="modal" data-target="#task_modal_' . $key . '">';
-                $output .= get_the_title( $task->ID );
-                $output .= '</a>';
-                $output .= '</div>';
-                $output .= '</div>';
-
-                // Modal 
-                $output .= '<div class="modal fade" id="task_modal_' . $key . '" tabindex="-1" role="dialog">';
-                $output .= '<div class="modal-dialog modal-lg">';
-                $output .= '<div class="modal-content">';
-                $output .= '<div class="modal-header">';
-                $output .= '<h5 class="modal-title">' . get_the_title( $task->ID ) . '</h5>';
-                $output .= '</div>';
-                $output .= '<div class="modal-body">';
-                $output .= get_post_field('post_content', $task->ID );
-                $output .= '</div>';
-                $output .= '</div>';
-                $output .= '</div>';
-                $output .= '</div>';
-                */
             }
-            //$output .= '</div>';
             $output .= '
               </tbody>
             </table>

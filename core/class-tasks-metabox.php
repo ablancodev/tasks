@@ -13,7 +13,16 @@ class Tasks_Metabox {
         add_action( 'state_edit_form_fields', array( __CLASS__, 'state_edit_form_fields' ), 10, 2 );
         add_action( 'edited_state', array( __CLASS__, 'save_state' ), 10, 2 );
         add_action( 'create_state', array( __CLASS__, 'save_state' ), 10, 2 );
+    
+        // Projects
+        add_action( 'project_add_form_fields', array( __CLASS__, 'project_add_form_fields' ), 10, 2 );
+        add_action( 'project_edit_form_fields', array( __CLASS__, 'project_edit_form_fields' ), 10, 2 );
+        add_action( 'edited_project', array( __CLASS__, 'save_project' ), 10, 2 );
+        add_action( 'create_project', array( __CLASS__, 'save_project' ), 10, 2 );
+        
     }
+
+    // STATE
     
     public static function save_state( $term_id ) {
         if ( isset( $_POST['term_meta'] ) ) {
@@ -55,6 +64,48 @@ class Tasks_Metabox {
 	<?php
 	}
     
+	
+	// PROJECT
+	
+	public static function save_project( $term_id ) {
+	    if ( isset( $_POST['term_meta'] ) ) {
+	        /*
+	        $cat_keys = array_keys( $_POST['term_meta'] );
+	        foreach ( $cat_keys as $key ) {
+	            if ( isset ( $_POST['term_meta'][$key] ) ) {
+	                update_term_meta( $term_id, $key, sanitize_text_field( $_POST['term_meta'][$key] ) );
+	            }
+	        }
+	        */
+	        if ( isset( $_POST['term_meta']['user'] ) ) {
+	            update_term_meta( $term_id, 'user', intval( $_POST['term_meta']['user'] ) );
+	        }
+	    }
+	    
+	}
+	
+	public static function project_add_form_fields() {
+	    ?>
+		<div class="form-field">
+			<label for="term_meta[class_term_meta]"><?php _e( 'User', 'tasks' ); ?></label>
+			<?php wp_dropdown_users(array('name' => 'term_meta[user]'));?>
+		</div>
+	<?php
+	}
+    
+	public static function project_edit_form_fields( $term ) {
+	    ?>
+		<tr class="form-field">
+		<th scope="row" valign="top"><label for="term_meta[color]"><?php _e( 'User', 'tasks' ); ?></label></th>
+			<td>
+				<?php wp_dropdown_users( array( 'name' => 'term_meta[user]', 'selected' => get_term_meta( $term->term_id, 'user', true ) ) );?>
+			</td>
+		</tr>
+	<?php
+	}
+	
+	
+	
     /**
      * Adds the metaboxes to 'tasks'
      */
