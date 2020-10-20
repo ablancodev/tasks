@@ -62,8 +62,10 @@ class Tasks_Shortcode {
                     <tr>
                     <th scope="col">#</th>
                     <th scope="col">Asignada a</th>
+                    <th scope="col">Fecha</th>
                     <th scope="col">Proyecto</th>
                     <th scope="col">Título</th>
+                    <th scope="col">Tiempo</th>
                     <th scope="col">Estado</th>
                     </tr>
                 </thead>
@@ -89,12 +91,14 @@ class Tasks_Shortcode {
                 
                 $post_user_id = get_post_meta( $task->ID, 'user', true );
                 $output .= '
-                <tr style="' . $back_color .'">
+                <tr>
                   <th scope="row">#' . $task->ID . '</th>
-                  <td>' . get_avatar( $post_user_id ) . '</td>
+                  <td>' . get_userdata( $post_user_id )->display_name . '</td>
+                  <td>' . get_the_date('d/m/Y', $task->ID) . '</td>
                   <td>' . $project_name . '</td>
-                  <td><a href="' . get_the_permalink( $task->ID ) . '">' . get_the_title( $task->ID ) . '</a></td>
-                  <td>' . strip_tags( get_the_term_list( $task->ID, 'state' ) ) . '</td>
+                  <td>' . get_the_title( $task->ID ) . '</td>
+                  <td>' . get_field('time', $task->ID) . '</td>
+                  <td style="' . $back_color .'">' . strip_tags( get_the_term_list( $task->ID, 'state' ) ) . '</td>
                 </tr>
                 ';
             }
@@ -103,7 +107,7 @@ class Tasks_Shortcode {
             </table>
             ';
         } else {
-            $output .= '<h2>En breve podra ver aquí nuestra sección de tasks</h2>';
+            $output .= '<h2>Aún no hay tareas disponibles.</h2>';
         }
         return $output;
     }
