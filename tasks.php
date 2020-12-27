@@ -68,7 +68,12 @@ class Tasks_Plugin {
 		require_once 'core/class-tasks-shortcode.php';
 		require_once 'core/class-tasks-cpt.php';
 		require_once 'core/class-tasks-metabox.php';
-
+		require_once 'core/class-tasks.php';
+		
+		// Resources module
+		require_once 'modules/resources/class-tasks-resources.php';
+		require_once 'modules/resources/class-calendar.php';
+		
 		// styles & javascript
 		add_action ( 'wp_enqueue_scripts', array (
 				__CLASS__,

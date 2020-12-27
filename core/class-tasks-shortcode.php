@@ -1,11 +1,20 @@
 <?php
 class Tasks_Shortcode {
     public static function init()  {
+    
         add_shortcode('tasks_list', array( __CLASS__, 'tasks_list' ) );
+        
+        // Resources
+        add_shortcode('calendar_resources', array( __CLASS__, 'calendar_resources' ) );
+        
     }
 
-    public static function tasks_list() {
+    public static function tasks_list( $attr ) {
         global $post;
+        
+        $attr = shortcode_atts( array(
+            'hide_author' => 0
+        ), $attr );
         
         $output = '';
         
@@ -61,7 +70,7 @@ class Tasks_Shortcode {
                 <thead class="thead-dark">
                     <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Asignada a</th>
+                    ' . ($attr['hide_author']) ? '' : '<th scope="col">Asignada a</th>' . '
                     <th scope="col">Fecha</th>
                     <th scope="col">Proyecto</th>
                     <th scope="col">Título</th>
@@ -93,7 +102,7 @@ class Tasks_Shortcode {
                 $output .= '
                 <tr>
                   <th scope="row">#' . $task->ID . '</th>
-                  <td>' . get_userdata( $post_user_id )->display_name . '</td>
+                  ' . ($attr['hide_author']) ? '' : '<td>' . get_userdata( $post_user_id )->display_name . '</td>' . '
                   <td>' . get_the_date('d/m/Y', $task->ID) . '</td>
                   <td>' . $project_name . '</td>
                   <td>' . get_the_title( $task->ID ) . '</td>
@@ -109,6 +118,11 @@ class Tasks_Shortcode {
         } else {
             $output .= '<h2>Aún no hay tareas disponibles.</h2>';
         }
+        return $output;
+    }
+    
+    public static function calendar_resources( $attr ) {        
+        $output = Calendar::get_calendar();
         return $output;
     }
 }

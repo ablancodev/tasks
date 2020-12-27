@@ -111,27 +111,60 @@ class Tasks_Metabox {
      */
     public static function add_metabox() {
         add_meta_box(
-            'my-meta-box',
-            __( 'User', TASKS_PLUGIN_DOMAIN ),
-            array( __CLASS__, 'render_metabox' ),
+            'dates',
+            __( 'Dates', TASKS_PLUGIN_DOMAIN ),
+            array( __CLASS__, 'render_metabox_dates' ),
             'task',
-            'side',
+            'normal',
             'default'
             );
-        
+        add_meta_box(
+            'user_assign',
+            __( 'User assign', TASKS_PLUGIN_DOMAIN ),
+            array( __CLASS__, 'render_metabox_user_assign' ),
+            'task',
+            'normal',
+            'default'
+            );
     }
     
     /**
-     * Renders the meta box.
+     * Renders the meta box: user assign
      */
-    public static function render_metabox( $post ) {
+    public static function render_metabox_dates( $post ) {
         // Add nonce for security and authentication.
         wp_nonce_field( 'custom_nonce_action', 'custom_nonce' );
         ?>
+        
+        <?php 
+        // Start date
+        $start_date = get_post_meta( $post->ID, 'start_date', true );
+        ?>
+        <label for="title_field" style="width:150px; display:inline-block;"><?php echo esc_html__('Start date', TASKS_PLUGIN_DOMAIN);?></label>
+        <input type="date" name="start_date" id="start_date" value="<?php echo $start_date;?>"/>
+		
+		<?php 
+        // End date
+        $end_date = get_post_meta( $post->ID, 'end_date', true );
+        ?>
+        <label for="title_field" style="width:150px; display:inline-block;"><?php echo esc_html__('End date', TASKS_PLUGIN_DOMAIN);?></label>
+        <input type="date" name="end_date" id="end_date" value="<?php echo $end_date;?>"/>
+		
+        <?php
+    }
+    
+    /**
+     * Renders the meta box: user assign
+     */
+    public static function render_metabox_user_assign( $post ) {
+        // Add nonce for security and authentication.
+        wp_nonce_field( 'custom_nonce_action', 'custom_nonce' );
+        ?>
+        
         <label for="title_field" style="width:150px; display:inline-block;"><?php echo esc_html__('User', TASKS_PLUGIN_DOMAIN);?></label>
-		<select id="user" name="user" class="title_field">
+		<select id="resource" name="resource" class="title_field">
   		<?php 
-  		$post_user_id = get_post_meta( $post->ID, 'user', true );
+  		$post_user_id = get_post_meta( $post->ID, 'resource', true );
   		$users = get_users();
   		foreach ( $users as $user ) {
   		    $user_info = get_userdata( $user->ID );
@@ -146,11 +179,14 @@ class Tasks_Metabox {
   		?>
   		</select>       
         
+        <?php 
+        // User load %
+        $user_load = get_post_meta( $post->ID, 'user_load', true );
+        ?>
+        <label for="title_field" style="width:150px; display:inline-block;"><?php echo esc_html__('User load (%)', TASKS_PLUGIN_DOMAIN);?></label>
+        <input type="number" name="user_load" id="user_load" value="<?php echo $user_load;?>"/>
+		
         <?php
-        //$outline = '<label for="title_field" style="width:150px; display:inline-block;">'. esc_html__('User', TASKS_PLUGIN_DOMAIN) .'</label>';
-        //$title_field = get_post_meta( $post->ID, 'precio', true );
-        //$outline .= '<input type="text" name="precio" id="title_field" class="title_field" value="'. esc_attr($title_field) .'" />';
-        //echo $outline;
     }
     
     /**
@@ -190,8 +226,20 @@ class Tasks_Metabox {
             return;
         }
         */
-        $user_id   = isset( $_POST['user'] ) ? sanitize_text_field( $_POST['user'] ) : '';
-        update_post_meta( $post_id, 'user', $user_id );
+        
+        $user_id   = isset( $_POST['resource'] ) ? intval( $_POST['resource'] ) : '';
+        update_post_meta( $post_id, 'resource', $user_id );
+        
+        $user_load   = isset( $_POST['user_load'] ) ? intval( $_POST['user_load'] ) : '';
+        update_post_meta( $post_id, 'user_load', $user_load );
+        
+        $start_date   = isset( $_POST['start_date'] ) ? sanitize_text_field( $_POST['start_date'] ) : '';
+        update_post_meta( $post_id, 'start_date', $start_date );
+        
+        $end_date   = isset( $_POST['end_date'] ) ? sanitize_text_field( $_POST['end_date'] ) : '';
+        update_post_meta( $post_id, 'end_date', $end_date );
+        
+        
     }
 }
 
