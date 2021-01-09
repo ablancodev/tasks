@@ -21,7 +21,7 @@
  * Plugin Name: Tasks
  * Plugin URI: http://www.eggemplo.com
  * Description: Simple catalog plugin
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: eggemplo
  * Author URI: http://www.ablancodev.com
  * Text Domain: tasks

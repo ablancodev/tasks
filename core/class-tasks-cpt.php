@@ -92,7 +92,7 @@ class Tasks_CPT {
 	        'menu_name' => __( 'Projects' ),
 	    );
 	    register_taxonomy( 'project', 'task', array(
-	        'hierarchical' => false,
+	        'hierarchical' => true,
 	        'labels' => $labels,
 	        'show_ui' => true,
 	        'show_admin_column' => true,
@@ -121,7 +121,7 @@ class Tasks_CPT {
 	        'menu_name' => __( 'States' ),
 	    );
 	    register_taxonomy( 'state', 'task', array(
-	        'hierarchical' => false,
+	        'hierarchical' => true,
 	        'labels' => $labels,
 	        'show_ui' => true,
 	        'show_admin_column' => true,

@@ -2,18 +2,15 @@
 class Calendar {
     
     public static function get_calendar() {
-        parse_str($_SERVER['QUERY_STRING']);
+        parse_str($_SERVER['QUERY_STRING'], $args);
         
-        if ($m == ""){
-            
+        if (!isset($args['mo'])){
             $dateComponents = getdate();
             $month = $dateComponents['mon'];
             $year = $dateComponents['year'];
         } else {
-            
-            $month = $m;
-            $year = $y;
-            
+            $month = $args['mo'];
+            $year = $args['yr'];
         }
         
         $output = '';
@@ -27,7 +24,15 @@ class Calendar {
     static function build_calendar($month,$year,$dateArray) {
         
         // Create array containing abbreviations of days of week.
-        $daysOfWeek = array('Sun','Mon','Tues','Wed','Thurs','Fri','Sat');
+        $daysOfWeek = array(
+            __('Mon'),
+            __('Tues'),
+            __('Wed'),
+            __('Thurs'),
+            __('Fri'),
+            __('Sat'),
+            __('Sun')
+        );
         
         // What is the first day of the month in question?
         $firstDayOfMonth = mktime(0,0,0,$month,1,$year);
@@ -40,7 +45,7 @@ class Calendar {
         $dateComponents = getdate($firstDayOfMonth);
         
         // What is the name of the month in question?
-        $monthName = $dateComponents['month'];
+        $monthName = ucfirst(__($dateComponents['month']));
         
         // What is the index value (0-6) of the first day of the
         // month in question.
@@ -48,7 +53,8 @@ class Calendar {
         
         // Create the table tag opener and day headers
         
-        $calendar = "<table class='calendar'>";
+        $calendar = "<div style='width: 100%; display:inline; padding: 20px;'>";
+        $calendar .= "<table class='calendar'>";
         $calendar .= "<caption>$monthName $year</caption>";
         $calendar .= "<tr>";
         
@@ -69,7 +75,7 @@ class Calendar {
         // The variable $dayOfWeek is used to
         // ensure that the calendar
         // display consists of exactly 7 columns.
-        
+        $dayOfWeek --;
         if ($dayOfWeek > 0) {
             $calendar .= "<td colspan='$dayOfWeek' class='not-month'>&nbsp;</td>";
         }
@@ -80,7 +86,7 @@ class Calendar {
             
             $content = self::get_day_content($currentDay, $month, $year);
             
-            // Seventh column (Saturday) reached. Start a new row.
+            // Seventh column (Sunday) reached. Start a new row.
             
             if ($dayOfWeek == 7) {
                 
@@ -120,6 +126,7 @@ class Calendar {
         $calendar .= "</tr>";
         
         $calendar .= "</table>";
+        $calendar .= '</div>';
         
         return $calendar;
         
@@ -140,9 +147,9 @@ class Calendar {
         }
         
         $dateObj = DateTime::createFromFormat('!m', $prevMonth);
-        $monthName = $dateObj->format('F');
+        $monthName = ucfirst(__($dateObj->format('F')));
         
-        return "<div style='width: 33%; display:inline-block;'><a href='?m=" . $prevMonth . "&y=". $prevYear ."'><- " . $monthName . "</a></div>";
+        return "<div style='width: 33%; display:inline-block;'><a href='?mo=" . $prevMonth . "&yr=". $prevYear ."'><- " . $monthName . "</a></div>";
     }
     
     static function build_nextMonth($month,$year,$monthString){
@@ -160,9 +167,9 @@ class Calendar {
         }
         
         $dateObj = DateTime::createFromFormat('!m', $nextMonth);
-        $monthName = $dateObj->format('F');
+        $monthName = ucfirst(__($dateObj->format('F')));
         
-        return "<div style='width: 33%; display:inline-block;'>&nbsp;</div><div style='width: 33%; display:inline-block; text-align:right;'><a href='?m=" . $nextMonth . "&y=". $nextYear ."'>" . $monthName . " -></a></div>";
+        return "<div style='width: 33%; display:inline-block;'>&nbsp;</div><div style='width: 33%; display:inline-block; text-align:right;'><a href='?mo=" . $nextMonth . "&yr=". $nextYear ."'>" . $monthName . " -></a></div>";
     }
     
     static function get_day_content( $currentDay, $month, $year ) {

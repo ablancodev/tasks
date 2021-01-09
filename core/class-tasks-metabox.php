@@ -87,7 +87,7 @@ class Tasks_Metabox {
 	public static function project_add_form_fields() {
 	    ?>
 		<div class="form-field">
-			<label for="term_meta[class_term_meta]"><?php _e( 'User', 'tasks' ); ?></label>
+			<label for="term_meta[class_term_meta]"><?php _e( 'Client', 'tasks' ); ?></label>
 			<?php wp_dropdown_users(array('name' => 'term_meta[user]'));?>
 		</div>
 	<?php
@@ -96,7 +96,7 @@ class Tasks_Metabox {
 	public static function project_edit_form_fields( $term ) {
 	    ?>
 		<tr class="form-field">
-		<th scope="row" valign="top"><label for="term_meta[color]"><?php _e( 'User', 'tasks' ); ?></label></th>
+		<th scope="row" valign="top"><label for="term_meta[color]"><?php _e( 'Client', 'tasks' ); ?></label></th>
 			<td>
 				<?php wp_dropdown_users( array( 'name' => 'term_meta[user]', 'selected' => get_term_meta( $term->term_id, 'user', true ) ) );?>
 			</td>
@@ -149,6 +149,13 @@ class Tasks_Metabox {
         ?>
         <label for="title_field" style="width:150px; display:inline-block;"><?php echo esc_html__('End date', TASKS_PLUGIN_DOMAIN);?></label>
         <input type="date" name="end_date" id="end_date" value="<?php echo $end_date;?>"/>
+		
+        <?php
+        // Duration
+        $end_date = get_post_meta( $post->ID, 'duration', true );
+        ?>
+        <label for="title_field" style="width:150px; display:inline-block;"><?php echo esc_html__('Duration in minutes', TASKS_PLUGIN_DOMAIN);?></label>
+        <input type="number" name="duration" id="duration" value="<?php echo $end_date;?>"/>
 		
         <?php
     }
@@ -239,6 +246,8 @@ class Tasks_Metabox {
         $end_date   = isset( $_POST['end_date'] ) ? sanitize_text_field( $_POST['end_date'] ) : '';
         update_post_meta( $post_id, 'end_date', $end_date );
         
+        $duration   = isset( $_POST['duration'] ) ? intval( $_POST['duration'] ) : '0';
+        update_post_meta( $post_id, 'duration', $duration );
         
     }
 }

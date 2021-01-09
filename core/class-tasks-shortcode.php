@@ -34,6 +34,7 @@ class Tasks_Shortcode {
                 'taxonomy'  => 'project',
             );
             $projects = get_terms( $args );
+                        
             $projects_id = array();
             if ( $projects ) {
                 foreach ( $projects as $project ) {
@@ -62,6 +63,8 @@ class Tasks_Shortcode {
         }
         
         if ( $tasks ) {
+            $columna_asignada_a = ($attr['hide_author']) ? '' : '<th scope="col">Asignada a</th>';
+            
             $output .= '<div class="container">';
             $output .= '<div class="row task-row">';
             $output .= '<input type="text" id="taskSearchInput" placeholder="' . __( 'Search', 'tasks' ) . '"/>';
@@ -70,12 +73,12 @@ class Tasks_Shortcode {
                 <thead class="thead-dark">
                     <tr>
                     <th scope="col">#</th>
-                    ' . ($attr['hide_author']) ? '' : '<th scope="col">Asignada a</th>' . '
-                    <th scope="col">Fecha</th>
-                    <th scope="col">Proyecto</th>
-                    <th scope="col">Título</th>
-                    <th scope="col">Tiempo</th>
-                    <th scope="col">Estado</th>
+                    ' . $columna_asignada_a . '
+                    <th scope="col">' . __('Date', 'tasks') . '</th>
+                    <th scope="col">' . __('Project', 'tasks') . '</th>
+                    <th scope="col">' . __('Title', 'tasks') . '</th>
+                    <th scope="col">' . __('Duration', 'tasks') . '</th>
+                    <th scope="col">' . __('Status', 'tasks') . '</th>
                     </tr>
                 </thead>
                 <tbody id="tasksTable">';
@@ -99,14 +102,18 @@ class Tasks_Shortcode {
                 }
                 
                 $post_user_id = get_post_meta( $task->ID, 'user', true );
+                $columna_asignada_a = '';
+                if ( !$attr['hide_author'] ) {
+                    $columna_asignada_a = '<td>' . get_userdata( $post_user_id )->display_name . '</td>';
+                }
                 $output .= '
                 <tr>
                   <th scope="row">#' . $task->ID . '</th>
-                  ' . ($attr['hide_author']) ? '' : '<td>' . get_userdata( $post_user_id )->display_name . '</td>' . '
-                  <td>' . get_the_date('d/m/Y', $task->ID) . '</td>
+                  ' . $columna_asignada_a . '
+                  <td>' . get_post_meta($task->ID, 'start_date', true) . '</td>
                   <td>' . $project_name . '</td>
                   <td>' . get_the_title( $task->ID ) . '</td>
-                  <td>' . get_field('time', $task->ID) . '</td>
+                  <td>' . get_post_meta($task->ID, 'duration', true) . 'm.</td>
                   <td style="' . $back_color .'">' . strip_tags( get_the_term_list( $task->ID, 'state' ) ) . '</td>
                 </tr>
                 ';
@@ -116,7 +123,7 @@ class Tasks_Shortcode {
             </table>
             ';
         } else {
-            $output .= '<h2>Aún no hay tareas disponibles.</h2>';
+            $output .= '<h2>' . __('No tasks available yet.', 'tasks') . '</h2>';
         }
         return $output;
     }

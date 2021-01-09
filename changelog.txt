@@ -1,0 +1,6 @@
+1.0.2
+------
+* Proyects and States hierarchicals.
+* Projects: User -> Client
+* Lunes es el primer día de la semana en calendario.
+* Traducidos meses del calendario.
