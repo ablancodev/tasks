@@ -82,23 +82,36 @@ class Tasks_Plugin {
 	}
 
 	public static function admin_init() {
-
+	    // styles & javascript
+	    add_action ( 'admin_enqueue_scripts', array (
+	        __CLASS__,
+	        'admin_enqueue_scripts'
+	    ) );
 	}
 
 
 	public static function wp_enqueue_scripts($page) {
 	    // js
 	    // Our javascript
-	    wp_register_script ( 'task-scripts', TASKS_PLUGIN_URL . '/js/tasks.js', array ( 'jquery' ), microtime(true), true );
+	    wp_register_script ( 'task-scripts', TASKS_PLUGIN_URL . '/js/tasks.js', array ( 'jquery' ), '0.0.1', true );
 	    wp_enqueue_script ( 'task-scripts' );
 	    
 	    // css
 	    wp_register_style ( 'tasks-style', TASKS_PLUGIN_URL . '/css/tasks-style.css', array (), '1.0.0' );
 	    wp_enqueue_style ( 'tasks-style' );
-	    
-
 	}
 
+	public static function admin_enqueue_scripts($page) {
+	    // js
+	    // Our javascript
+	    wp_register_script ( 'task-admin-scripts', TASKS_PLUGIN_URL . '/js/tasks-admin.js', array ( 'jquery' ), time(), true );
+	    wp_enqueue_script ( 'task-admin-scripts' );
+	    
+	    // css
+	    wp_register_style ( 'tasks-admin-style', TASKS_PLUGIN_URL . '/css/tasks-admin-style.css', array (), '1.0.0' );
+	    wp_enqueue_style ( 'tasks-admin-style' );
+	}
+	
 	public static function admin_notices() {
 		if (! empty ( self::$notices )) {
 			foreach ( self::$notices as $notice ) {

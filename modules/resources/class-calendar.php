@@ -176,9 +176,19 @@ class Calendar {
         $loads = Tasks_Resources::getLoadsByDay($currentDay, $month, $year);
         $output = '';
         if ( $loads && (sizeof($loads) > 0) ) {
-            
             foreach ( $loads as $load ) {
-                $output .= '<p class="load-status-' . intval($load['value']/10) . '">' . $load['username'] . ' (' . $load['value'] . '%)</p>';
+                $user = get_user_by('login',$load['username']);
+                $tasks = Tasks::getTasksByDay($currentDay, $month, $year, $user->ID);
+                
+                $tooltip = '';
+                if ( $tasks ) {
+                    $tooltip = '<span class="tooltiptext"><ul>';
+                    foreach ( $tasks as $task ) {
+                        $tooltip .= '<li>' . get_the_title($task) . '</li>';
+                    }
+                    $tooltip .= '</ul></span>';
+                }
+                $output .= '<div class="tooltip"><p class="load-status-' . intval($load['value']/10) . '">' . $load['username'] . ' (' . $load['value'] . '%)</p>' . $tooltip . '</div>';
             }
         }
         return $output;

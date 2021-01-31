@@ -120,8 +120,18 @@ class Tasks_Metabox {
             );
         add_meta_box(
             'user_assign',
-            __( 'User assign', TASKS_PLUGIN_DOMAIN ),
+            __( 'Resources', TASKS_PLUGIN_DOMAIN ),
             array( __CLASS__, 'render_metabox_user_assign' ),
+            'task',
+            'normal',
+            'default'
+            );
+        
+        // Entradas de tiempo
+        add_meta_box(
+            'time_entries',
+            __( 'Time entries', TASKS_PLUGIN_DOMAIN ),
+            array( __CLASS__, 'render_metabox_time_entries' ),
             'task',
             'normal',
             'default'
@@ -170,6 +180,7 @@ class Tasks_Metabox {
         
         <label for="title_field" style="width:150px; display:inline-block;"><?php echo esc_html__('User', TASKS_PLUGIN_DOMAIN);?></label>
 		<select id="resource" name="resource" class="title_field">
+		<option value="0">---</option>
   		<?php 
   		$post_user_id = get_post_meta( $post->ID, 'resource', true );
   		$users = get_users();
@@ -195,6 +206,49 @@ class Tasks_Metabox {
 		
         <?php
     }
+
+    /**
+     * Renders the meta box: time_entries
+     */
+    public static function render_metabox_time_entries( $post ) {
+        // Add nonce for security and authentication.
+        wp_nonce_field( 'custom_nonce_action', 'custom_nonce' );
+
+        $time_entries_total = get_post_meta( $post->ID, 'time_entries_total', true );
+        
+        $time_entries = get_post_meta( $post->ID, 'time_entries', true );
+  		$time_entries = maybe_unserialize( $time_entries );
+  		?>
+  		<h4>Total time: <?php echo $time_entries_total;?> min.</h4>
+  		<div class="table-responsive">
+			<table class="tasks_time_entries_table grid" id="sort">
+				<thead>
+					<tr>
+						<th class="tasks_time_entries-table-desc" width="70%">Descripción</th>
+						<th class="tasks_time_entries-table-cant" width="15%">Fecha</th>
+						<th class="tasks_time_entries-table-price" width="15%">Tiempo</th>
+					</tr>
+				</thead>
+				<tbody>
+    			<?php
+          		if ( is_array( $time_entries ) ) {
+          		    foreach ( $time_entries as $time_entry ) {
+          		        ?>
+          		        <tr>
+							<td><input type="text" name="time_entries_desc[]" placeholder="Descripción" value="<?php echo $time_entry['desc'];?>"/></td>
+							<td class="right"><input type="date" name="time_entries_date[]" placeholder="Fecha" value="<?php echo $time_entry['date'];?>"/></td>
+							<td class="right"><input type="number" name="time_entries_time[]" placeholder="Tiempo" value="<?php echo $time_entry['time'];?>"/></td>
+						</tr>
+          		        <?php
+          		    }
+          		}
+          		?>
+  				</tbody>
+			</table>
+		</div>		
+		<button id="tasks_time_entries_button_add_item" class="button button-primary button-large" onclick="return false;"><?php _e( "Añadir entrada de tiempo", TASKS_PLUGIN_DOMAIN );?></button>
+  		<?php
+     }
     
     /**
      * Handles saving the meta box.
@@ -249,6 +303,42 @@ class Tasks_Metabox {
         $duration   = isset( $_POST['duration'] ) ? intval( $_POST['duration'] ) : '0';
         update_post_meta( $post_id, 'duration', $duration );
         
+        // Time entries
+        if ( isset( $_POST['time_entries_desc'] ) ) {
+            $descriptions = array();
+            foreach ( $_POST['time_entries_desc'] as $description ) {
+                $descriptions[] = sanitize_text_field( $description );
+            }
+            $dates = array();
+            foreach ( $_POST['time_entries_date'] as $date ) {
+                $dates[] = sanitize_text_field( $date );
+            }
+            $times = array();
+            foreach ( $_POST['time_entries_time'] as $time ) {
+                $times[] = sanitize_text_field( $time );
+            }
+            
+            $time_entries = array();
+            $cnt = 0;
+            $time_entries_total = 0;
+            foreach ( $descriptions as $description ) {
+                if (( strlen($description) > 0 ) || ( strlen($dates[$cnt]) > 0 ) || ( strlen($times[$cnt]) > 0 )) {
+                    $time_entries[] = array(
+                        'desc' => $description,
+                        'date' => $dates[$cnt],
+                        'time' => $times[$cnt]
+                    );
+                    $time_entries_total += intval($times[$cnt]);
+                }
+                $cnt++;
+            }
+            
+            $values = maybe_serialize( $time_entries );
+            update_post_meta( $post->ID, 'time_entries', $values );
+        
+            // Por rendimiento guardamos este dato aparte, para no tener que estar calculando constantemente.
+            update_post_meta( $post->ID, 'time_entries_total', $time_entries_total );
+        }
     }
 }
 

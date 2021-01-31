@@ -78,6 +78,7 @@ class Tasks_Shortcode {
                     <th scope="col">' . __('Project', 'tasks') . '</th>
                     <th scope="col">' . __('Title', 'tasks') . '</th>
                     <th scope="col">' . __('Duration', 'tasks') . '</th>
+                    <th scope="col">' . __('Time', 'tasks') . '</th>
                     <th scope="col">' . __('Status', 'tasks') . '</th>
                     </tr>
                 </thead>
@@ -113,7 +114,8 @@ class Tasks_Shortcode {
                   <td>' . get_post_meta($task->ID, 'start_date', true) . '</td>
                   <td>' . $project_name . '</td>
                   <td>' . get_the_title( $task->ID ) . '</td>
-                  <td>' . get_post_meta($task->ID, 'duration', true) . 'm.</td>
+                  <td>' . get_post_meta($task->ID, 'duration', true) . 'min.</td>
+                  <td>' . get_post_meta($task->ID, 'time_entries_total', true) . 'min.</td>
                   <td style="' . $back_color .'">' . strip_tags( get_the_term_list( $task->ID, 'state' ) ) . '</td>
                 </tr>
                 ';
